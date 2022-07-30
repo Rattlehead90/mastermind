@@ -11,12 +11,12 @@
 
 # Breaking down the game to classes and objects:
 # - class sequence with the ability to #create_new and #check if the input is #is_correct?
-# - computer class that #guesses and a player which has a @name and @guesses [sanitizing input]
+# - computer class that #guesses and a player which has a @name and #guesses [sanitizing input]
 # - class Game itself that has a greeting, initializing
 #                             (creating instances of player, computer and sequence classes),
 #     finally it should #play a game: repeat the guessing game 12 times giving the assessment
 
-# sequence to geuss
+# Sequence to guess
 class Sequence
   attr_reader :colors
 
@@ -35,4 +35,17 @@ class Sequence
   def correct?(guess)
     guess == @colors
   end
+end
+
+# Player class who's making a guess
+class Player 
+  def initialize(name)
+    @name = name
+  end
+
+  # def guess
+  #   chosen_colors = gets.chomp.split
+  #   chosen_colors.each do |chosen_color| 
+  #     if 
+  # end
 end
