@@ -29,10 +29,10 @@ class Sequence
 
   def create_new
     @colors = Array.new(@length) { rand(@basic_colors.length) }
-                  .map { |color_index| @basic_colors[color_index] }
+                   .map { |color_index| @basic_colors[color_index] }
+  end
+
+  def correct?(guess)
+    guess == @colors
   end
 end
-
-seq = Sequence.new(4)
-seq.create_new
-puts seq.colors
