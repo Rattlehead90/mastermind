@@ -10,8 +10,8 @@
 #     computer tries to guess while recieving the output as a person would
 
 # Breaking down the game to classes and objects:
-# - class sequence with the ability to #create_new and #check if the input is #is_correct?
-# - computer class that #guesses and a player which has a @name and #guesses [sanitizing input]
+# - class Sequence with the ability to #create_new and #check if the input is #is_correct?
+# - Computer class that #guesses and a Player which has a @name and #guesses [sanitizing input]
 # - class Game itself that has a greeting, initializing
 #                             (creating instances of player, computer and sequence classes),
 #     finally it should #play a game: repeat the guessing game 12 times giving the assessment
@@ -65,9 +65,7 @@ end
 # Game class to orchestrate the game
 class Game
   def initialize
-    unless @player 
-      greetings
-    end
+    greetings unless @player
     puts 'Select the length of the sequence you\'d dare to crack:'
     puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
     sequence = Sequence.new(gets.chomp)
@@ -85,6 +83,10 @@ class Game
     puts 'What\'s your name? '
     @player = Player.new(gets.chomp)
     puts "Okay, #{@player.name}, you have 12 turns to crack the code."
+  end
+
+  def play
+    
   end
 end
 
