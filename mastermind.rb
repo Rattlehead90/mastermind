@@ -17,6 +17,8 @@
 #     finally it should #play a game: repeat the guessing game 12 times giving the assessment
 
 # Colors module that plugs in the basic colors to the game
+require 'pry-byebug'
+
 module Colors
   def basic_colors
     %w[red yellow blue green orange pink black white purple]
@@ -28,8 +30,13 @@ class Sequence
   include Colors
 
   def initialize(length = 4)
+    until (length.to_i.positive? || length == '' ) && length.to_i.between?(1, 10)
+      puts 'Wrong value! Please, enter a number of colors in a sequence: '
+      puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
+      length = gets.chomp
+    end
     @basic_colors = basic_colors
-    @length = length
+    @length = length.to_i
   end
 
   def create_new
@@ -44,6 +51,8 @@ end
 
 # Player class who's making a guess
 class Player
+  attr_reader :name
+
   def initialize(name)
     @name = name
   end
@@ -53,3 +62,30 @@ class Player
   end
 end
 
+# Game class to orchestrate the game
+class Game
+  def initialize
+    unless @player 
+      greetings
+    end
+    puts 'Select the length of the sequence you\'d dare to crack:'
+    puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
+    sequence = Sequence.new(gets.chomp)
+    puts sequence.create_new
+  end
+
+  def greetings
+    puts '11__ll11__ll11__ll11__ll11__ll11__ll11__ll11__ll11__ll'
+    puts '11__ll11__ll11__ll11__llWELCOME1__ll11__ll11__ll11__ll'
+    puts '11__ll11__ll11__ll11__ll11TOll11__ll11__ll11__ll11__ll'
+    puts '11__ll11__ll11__ll11__MASTERMIND__ll11__ll11__ll11__ll'
+    puts 'rules*******rules*******rules*******rules*********rules'
+    puts 'Guess the secret sequence of colors that computer has '
+    puts 'generated in order to win. '
+    puts 'What\'s your name? '
+    @player = Player.new(gets.chomp)
+    puts "Okay, #{@player.name}, you have 12 turns to crack the code."
+  end
+end
+
+Game.new
