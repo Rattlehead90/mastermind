@@ -16,14 +16,19 @@
 #                             (creating instances of player, computer and sequence classes),
 #     finally it should #play a game: repeat the guessing game 12 times giving the assessment
 
+# Colors module that plugs in the basic colors to the game
+module Colors
+  def basic_colors
+    %w[red yellow blue green orange pink black white purple]
+  end
+end
+
 # Sequence to guess
 class Sequence
-  attr_reader :colors
+  include Colors
 
   def initialize(length = 4)
-    @basic_colors = %w[
-      red yellow blue green orange pink black white purple
-    ]
+    @basic_colors = basic_colors
     @length = length
   end
 
@@ -38,14 +43,13 @@ class Sequence
 end
 
 # Player class who's making a guess
-class Player 
+class Player
   def initialize(name)
     @name = name
   end
 
-  # def guess
-  #   chosen_colors = gets.chomp.split
-  #   chosen_colors.each do |chosen_color| 
-  #     if 
-  # end
+  def guess
+    gets.chomp.split
+  end
 end
+
