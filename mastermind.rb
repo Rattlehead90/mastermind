@@ -53,24 +53,40 @@ class Sequence
     end
     guess == @colors
   end
+
+  def feedback(current_guess)
+    current_guess.each_with_index do |color, index| 
+      if @colors.include?(color)
+        if index == @colors.index(color)
+          current_guess[index] = 'B'
+        else
+          current_guess[index] = 'C'
+        end
+      else
+        current_guess[index] = 'X'
+      end
+    end
+    puts "Result: #{current_guess.join}"
+  end
 end
 
 # Player class who's making a guess
 class Player
   include Colors
-  attr_reader :name
+  attr_reader :name, :current_guess
 
   def initialize(name)
     @name = name
     @basic_colors = basic_colors
+    @current_guess = []
   end
 
   def guess
     puts 'Available colors: '
-    @basic_colors.each { |color| print "#{color}; "}
+    @basic_colors.each { |color| print "#{color}; " }
     puts
     puts 'Input your guess below (e.g. \'black red white green\'): '
-    return gets.chomp.split
+    return @current_guess = gets.chomp.split
   end
 end
 
@@ -106,6 +122,7 @@ class Game
         puts 'You have guessed the sequence!'
         break
       end
+      @sequence.feedback(@player.current_guess)
       @turn += 1
     end
     puts 'You have failed to guess the sequence!' if @turn > 12
