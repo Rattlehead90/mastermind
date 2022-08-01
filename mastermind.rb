@@ -32,7 +32,7 @@ class Sequence
   def initialize(length = 4)
     until (length.to_i.positive? || length == '' ) && length.to_i.between?(1, 10)
       puts 'Wrong value! Please, enter a number of colors in a sequence: '
-      puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
+      puts 'max: 9 ------------ advised: 4 ------------ minimum: 1'
       length = gets.chomp
     end
     @basic_colors = basic_colors
@@ -40,11 +40,17 @@ class Sequence
   end
 
   def create_new
-    @colors = Array.new(@length) { rand(@basic_colors.length) }
-                   .map { |color_index| @basic_colors[color_index] }
+    @colors = (0...@length).to_a.shuffle
+                           .map { |color_index| @basic_colors[color_index] }
   end
 
-  def correct?(guess)
+  def correct?(player)
+    guess = []
+    puts '                V Input your guess below V                '
+    until guess.length == @length && (@basic_colors - guess).length == @basic_colors.length - @length
+      puts "Erronous input. Please choose from the available colors and be sure to type #{@length} of them correctly." unless guess == []
+      guess = player.guess
+    end
     guess == @colors
   end
 end
@@ -60,8 +66,11 @@ class Player
   end
 
   def guess
+    puts 'Available colors: '
+    @basic_colors.each { |color| print "#{color}; "}
+    puts
     puts 'Input your guess below (e.g. \'black red white green\'): '
-    guess = gets.chomp.split
+    return gets.chomp.split
   end
 end
 
@@ -71,7 +80,7 @@ class Game
     @turn = 1
     greetings unless @player
     puts 'Select the length of the sequence you\'d dare to crack:'
-    puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
+    puts 'max: 9 ------------ advised: 4 ------------ minimum: 1'
     @sequence = Sequence.new(gets.chomp)
     puts @sequence.create_new
     play
@@ -92,7 +101,8 @@ class Game
 
   def play
     while @turn <= 12
-      if @sequence.correct?(@player.guess)
+      puts "                     #{13 - @turn} turns left.           "
+      if @sequence.correct?(@player)
         puts 'You have guessed the sequence!'
         break
       end
