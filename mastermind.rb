@@ -16,9 +16,9 @@
 #                             (creating instances of player, computer and sequence classes),
 #     finally it should #play a game: repeat the guessing game 12 times giving the assessment
 
-# Colors module that plugs in the basic colors to the game
 require 'pry-byebug'
 
+# Colors module that plugs in the basic colors to the game
 module Colors
   def basic_colors
     %w[red yellow blue green orange pink black white purple]
@@ -51,25 +51,30 @@ end
 
 # Player class who's making a guess
 class Player
+  include Colors
   attr_reader :name
 
   def initialize(name)
     @name = name
+    @basic_colors = basic_colors
   end
 
   def guess
-    gets.chomp.split
+    puts 'Input your guess below (e.g. \'black red white green\'): '
+    guess = gets.chomp.split
   end
 end
 
 # Game class to orchestrate the game
 class Game
   def initialize
+    @turn = 1
     greetings unless @player
     puts 'Select the length of the sequence you\'d dare to crack:'
     puts 'max: 10 ------------ advised: 4 ------------ minimum: 1'
-    sequence = Sequence.new(gets.chomp)
-    puts sequence.create_new
+    @sequence = Sequence.new(gets.chomp)
+    puts @sequence.create_new
+    play
   end
 
   def greetings
@@ -86,7 +91,14 @@ class Game
   end
 
   def play
-    
+    while @turn <= 12
+      if @sequence.correct?(@player.guess)
+        puts 'You have guessed the sequence!'
+        break
+      end
+      @turn += 1
+    end
+    puts 'You have failed to guess the sequence!' if @turn > 12
   end
 end
 
