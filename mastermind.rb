@@ -1,21 +1,3 @@
-# choose whether you want to guess or to make the computer guess the set of colors
-# guess the color:
-#   computer creates a randomized sets of colors (any amount of colors)
-#   player geusses the sequence and recieves the feedback:
-#     (correct color in a correct position, correct color in wrong position, incorrect guess)
-#   if the player does not suceed under 12 turns the game is lost
-
-# computer makes the guess:
-#     player comes up with a sequence
-#     computer tries to guess while recieving the output as a person would
-
-# Breaking down the game to classes and objects:
-# - class Sequence with the ability to #create_new and #check if the input is #is_correct?
-# - Computer class that #guesses and a Player which has a @name and #guesses [sanitizing input]
-# - class Game itself that has a greeting, initializing
-#                             (creating instances of player, computer and sequence classes),
-#     finally it should #play a game: repeat the guessing game 12 times giving the assessment
-
 require 'pry-byebug'
 
 # Colors module that plugs in the basic colors to the game
@@ -28,6 +10,7 @@ end
 # Sequence to guess
 class Sequence
   include Colors
+  attr_reader :current_guess
 
   def initialize(length = 4)
     until (length.to_i.positive? || length == '' ) && length.to_i.between?(1, 10)
@@ -37,10 +20,28 @@ class Sequence
     end
     @basic_colors = basic_colors
     @length = length.to_i
+    @current_guess
   end
 
   def create_new
     @colors = (0...@length).to_a.shuffle
+                           .map { |color_index| @basic_colors[color_index] }
+  end
+
+  def let_player_create
+    puts "VV Enter #{@length} unique colors as a sequence for the computer to guess VV"
+    puts 'Available colors: '
+    @basic_colors.each { |color| print "#{color}; " }
+    puts
+    @colors = gets.chomp.split
+    until @colors.length == @length && (@basic_colors - @colors).length == @basic_colors.length - @length
+      puts "Erronous input. Please choose from the available colors and be sure to type #{@length} of them correctly."
+      @colors = gets.chomp.split
+    end
+  end
+
+  def guess
+    @current_guess = (0...@length).to_a.shuffle
                            .map { |color_index| @basic_colors[color_index] }
   end
 
@@ -75,7 +76,7 @@ class Player
   include Colors
   attr_reader :name, :current_guess
 
-  def initialize(name)
+  def initialize(name = '')
     @name = name
     @basic_colors = basic_colors
     @current_guess = []
@@ -90,16 +91,42 @@ class Player
   end
 end
 
+# class Computer < Player
+#   def initialize(sequence)
+#     @length = sequence.length
+#   end
+
+#   def guess
+#     puts 'Computer\'s guess is: '
+#   end
+
+# end
+
 # Game class to orchestrate the game
 class Game
   def initialize
     @turn = 1
     greetings unless @player
-    puts 'Select the length of the sequence you\'d dare to crack:'
-    puts 'max: 9 ------------ advised: 4 ------------ minimum: 1'
-    @sequence = Sequence.new(gets.chomp)
-    puts @sequence.create_new
-    play
+    rules
+    choice = guess_or_create
+    if choice == 'G'
+      puts 'Select the length of the sequence you\'d dare to crack:'
+      puts 'max: 9 ------------ advised: 4 ------------ minimum: 1'
+      @sequence = Sequence.new(gets.chomp)
+      @sequence.create_new
+      play_guess
+    elsif choice == 'C'
+      puts 'Select the length of the sequence you\'d like to create:'
+      puts 'max: 9 ------------ advised: 4 ------------ minimum: 1'
+      @sequence = Sequence.new(gets.chomp)
+      @sequence.let_player_create
+      let_computer_guess
+    end
+  end
+
+  def guess_or_create
+    puts 'Enter \'G\' if you wish to guess the sequence and \'C\' to create one yourself: '
+    gets.chomp.upcase
   end
 
   def greetings
@@ -107,15 +134,23 @@ class Game
     puts '11__ll11__ll11__ll11__llWELCOME1__ll11__ll11__ll11__ll'
     puts '11__ll11__ll11__ll11__ll11TOll11__ll11__ll11__ll11__ll'
     puts '11__ll11__ll11__ll11__MASTERMIND__ll11__ll11__ll11__ll'
-    puts 'rules*******rules*******rules*******rules*********rules'
-    puts 'Guess the secret sequence of colors that computer has '
-    puts 'generated in order to win. '
     puts 'What\'s your name? '
     @player = Player.new(gets.chomp)
-    puts "Okay, #{@player.name}, you have 12 turns to crack the code."
+    puts "Welcome, #{@player.name}, get ready to crack some minds"
   end
 
-  def play
+  def rules
+    puts 'rules*******rules*******rules*******rules*********rules'
+    puts 'Guess the secret sequence of colors that computer has '
+    puts 'generated in order to win. You have 12 turns to do that.'
+    puts 'if you\'re answer contains a color that is on it\'s right-'
+    puts 'ful place, it\'s a BULL [B] in Result row. If the color is'
+    puts 'present in the sequence, but is in a wrong position, it\'s '
+    puts 'a COW [C]. X means it\'s not in the sequence.'
+    puts 'You can also choose create the sequence for computer to guess!'
+  end
+
+  def play_guess
     while @turn <= 12
       puts "                     #{13 - @turn} turns left.           "
       if @sequence.correct?(@player)
@@ -123,6 +158,19 @@ class Game
         break
       end
       @sequence.feedback(@player.current_guess)
+      @turn += 1
+    end
+    puts 'You have failed to guess the sequence!' if @turn > 12
+  end
+
+  def let_computer_guess
+    while @turn <= 12
+      puts "                     #{13 - @turn} turns left.           "
+      if @sequence.correct?(@sequence)
+        puts 'You have guessed the sequence!'
+        break
+      end
+      @sequence.feedback(@sequence.current_guess)
       @turn += 1
     end
     puts 'You have failed to guess the sequence!' if @turn > 12
