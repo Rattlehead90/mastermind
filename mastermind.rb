@@ -1,5 +1,3 @@
-require 'pry-byebug'
-
 # Colors module that plugs in the basic colors to the game
 module Colors
   def basic_colors
